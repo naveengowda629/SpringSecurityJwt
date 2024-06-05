@@ -10,10 +10,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/auth")
 public class UserController {
 
     @Autowired
@@ -29,7 +30,7 @@ public class UserController {
     public String welcome(){
         return "hey buddy welcome this end pont is not secure";
     }
-    @PostMapping("/addUser")
+    @PostMapping("/addNewUser")
     public String addNewUser(@RequestBody UserInfo userInfo)throws Exception{
         return  service.addUser(userInfo);
     }
@@ -52,9 +53,11 @@ public class UserController {
                 .authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(),
                         authRequest.getPassword()));
         if(authentication.isAuthenticated()){
-
+            return jwtService.generateToken(authRequest.getUsername());
+        }else{
+            throw new UsernameNotFoundException("invalid user request");
         }
-        return  "";
+
     }
 
 
